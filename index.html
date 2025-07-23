@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monochromatic Color Palette Generator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Monochromatic Color Palette Generator</h1>
+
+      <div class="section">
+        <h2>Step 1: Choose a Primary Color</h2>
+        <p class="desc">
+          Used for buttons, focused inputs, checkboxes, and UI highlights.
+        </p>
+        <div class="input-group">
+          <input
+            type="color"
+            class="input-color"
+            id="primaryColor"
+            value="#3a86ff"
+          />
+          <input
+            type="text"
+            class="rgb-input"
+            id="rgbInput"
+            placeholder="RGB or HEX (e.g., 58, 134, 255 or #3a86ff)"
+          />
+          <button class="button" onclick="generatePalette()">
+            Generate Palette
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Step 2: Primary Color</h2>
+        <p class="desc">Your selected primary color.</p>
+        <div class="palette-grid" id="primaryPalette"></div>
+      </div>
+
+      <div class="section">
+        <h2>Step 3: Notification Colors</h2>
+        <p class="desc">
+          Standard colors for system feedback (success, warning, error).
+        </p>
+        <div class="palette-grid" id="notificationsPalette"></div>
+      </div>
+
+      <div class="section">
+        <h2>Step 4: Tints</h2>
+        <p class="desc">
+          Tints (lighter variants) for Primary, Success, Warning, and Error
+          colors. Used for backgrounds, cards, inputs, and hover states.
+        </p>
+        <div id="tintsPalette">
+          <div class="palette-section">
+            <div class="section-title">Primary Tints</div>
+            <div class="palette-row" id="primaryTints"></div>
+          </div>
+          <div class="palette-section">
+            <div class="section-title">Success Tints</div>
+            <div class="palette-row" id="successTints"></div>
+          </div>
+          <div class="palette-section">
+            <div class="section-title">Warning Tints</div>
+            <div class="palette-row" id="warningTints"></div>
+          </div>
+          <div class="palette-section">
+            <div class="section-title">Error Tints</div>
+            <div class="palette-row" id="errorTints"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Step 5: Shades</h2>
+        <p class="desc">
+          Shades (darker variants) for Primary, Success, Warning, and Error
+          colors. Used for text, pressed states, and icons.
+        </p>
+        <div id="shadesPalette">
+          <div class="palette-section">
+            <div class="section-title">Primary Shades</div>
+            <div class="palette-row" id="primaryShades"></div>
+          </div>
+          <div class="palette-section">
+            <div class="section-title">Success Shades</div>
+            <div class="palette-row" id="successShades"></div>
+          </div>
+          <div class="palette-section">
+            <div class="section-title">Warning Shades</div>
+            <div class="palette-row" id="warningShades"></div>
+          </div>
+          <div class="palette-section">
+            <div class="section-title">Error Shades</div>
+            <div class="palette-row" id="errorShades"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Step 6: Grayscale</h2>
+        <p class="desc">
+          Neutral tones for backgrounds, disabled states, and text. Based on
+          primary color with 20% saturation.
+        </p>
+        <div class="grayscale-grid" id="grayscalePalette"></div>
+      </div>
+
+      <div class="section">
+        <h2>Combined Palette</h2>
+        <p class="desc">
+          All generated colors combined in organized rows. Export as PNG or SVG.
+        </p>
+        <div id="finalPaletteContainer"></div>
+        <div class="export-buttons">
+          <button class="export-button" onclick="exportAsPNG()">
+            Download PNG
+          </button>
+          <button class="export-button svg" onclick="exportAsSVG()">
+            Download SVG
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
