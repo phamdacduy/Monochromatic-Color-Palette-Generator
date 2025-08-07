@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Palette Generator with Mobile Preview</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        padding: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          sans-serif;
+        background-color: #f9fafb;
+        color: #111827;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+      }
+
+      .left-column {
+        max-width: 100%;
+      }
+
+      .right-column {
+        position: sticky;
+        top: 1rem;
+        height: fit-content;
+      }
+
+      .section {
+        margin-bottom: 2rem;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: #1f2937;
+        grid-column: 1 / -1;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+
+      .desc {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+      }
+
+      .input-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .input-color {
+        appearance: none;
+        height: 3rem;
+        width: 4rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+
+      .input-color::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+
+      .input-color::-webkit-color-swatch {
+        border: none;
+        border-radius: 0.375rem;
+      }
+
+      .button {
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .button-primary {
+        background-color: var(--current-primary, #3b82f6);
+      }
+
+      .button-primary:hover {
+        background-color: var(--current-primary-shade, #2563eb);
+      }
+
+      .button-success {
+        background-color: var(--current-success, #10b981);
+      }
+
+      .button-success:hover {
+        background-color: var(--current-success-shade, #059669);
+      }
+
+      .palette-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      .palette-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .color-box {
+        width: 100%;
+        height: 80px;
+        border-radius: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 0.6rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.2s;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .color-box:hover {
+        transform: scale(1.05);
+      }
+
+      .color-code {
+        font-family: monospace;
+        font-size: 0.6rem;
+        margin-top: 0.25rem;
+      }
+
+      .rgb-input {
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-family: monospace;
+        font-size: 0.875rem;
+        min-width: 200px;
+        transition: border-color 0.2s;
+      }
+
+      .rgb-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+      }
+
+      .section-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #374151;
+      }
+
+      /* Mobile App Preview Styles */
+      .mobile-preview {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .phone-container {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+        background: #000;
+        border-radius: 25px;
+        padding: 8px;
+        position: relative;
+      }
+
+      .phone-screen {
+        width: 100%;
+        background: #f8f9fa;
+        border-radius: 18px;
+        overflow: hidden;
+        position: relative;
+        min-height: 600px;
+      }
+
+      .status-bar {
+        background: var(--primary-color, #3a86ff);
+        color: white;
+        padding: 8px 16px;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .app-bar {
+        background: var(--primary-color, #3a86ff);
+        color: white;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .app-bar-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .app-content {
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: var(--background-color, #f8f9fa);
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--card-border, #e5e7eb);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-tint, #dbeafe);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      .card-title {
+        font-weight: 600;
+        color: var(--text-primary, #1f2937);
+      }
+
+      .card-subtitle {
+        font-size: 12px;
+        color: var(--text-secondary, #6b7280);
+      }
+
+      .button-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .btn-primary {
+        background: var(--primary-color, #3a86ff);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .btn-secondary {
+        background: var(--secondary-bg, #f3f4f6);
+        color: var(--text-primary, #1f2937);
+        border: 1px solid var(--border-color, #e5e7eb);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .btn-success {
+        background: var(--success-color, #10b981);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .btn-warning {
+        background: var(--warning-color, #f59e0b);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .btn-error {
+        background: var(--error-color, #ef4444);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .bottom-nav {
+        background: white;
+        border-top: 1px solid var(--border-color, #e5e7eb);
+        display: flex;
+        padding: 8px 0;
+      }
+
+      .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px;
+        font-size: 10px;
+        color: var(--text-secondary, #6b7280);
+        cursor: pointer;
+      }
+
+      .nav-item.active {
+        color: var(--primary-color, #3a86ff);
+      }
+
+      .nav-icon {
+        font-size: 20px;
+        margin-bottom: 2px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat-card {
+        background: var(--primary-tint, #dbeafe);
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--primary-shade, #1d4ed8);
+      }
+
+      .stat-label {
+        font-size: 10px;
+        color: var(--text-secondary, #6b7280);
+        margin-top: 2px;
+      }
+
+      .notification-banner {
+        background: var(--success-tint, #d1fae5);
+        border: 1px solid var(--success-color, #10b981);
+        padding: 12px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .notification-icon {
+        color: var(--success-color, #10b981);
+        font-size: 16px;
+      }
+
+      .notification-text {
+        font-size: 12px;
+        color: var(--success-shade, #047857);
+        font-weight: 500;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .main-container {
+          grid-template-columns: 1fr;
+          max-width: 800px;
+        }
+
+        .right-column {
+          position: static;
+        }
+
+        .phone-container {
+          max-width: 360px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 0.5rem;
+        }
+
+        .section {
+          padding: 1rem;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        .palette-row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .color-box {
+          height: 60px;
+          font-size: 0.5rem;
+        }
+
+        .input-group {
+          justify-content: center;
+        }
+
+        .phone-container {
+          max-width: 280px;
+        }
+
+        .phone-screen {
+          min-height: 500px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Color Palette Generator with Live Preview</h1>
+
+    <div class="main-container">
+      <!-- Left Column - Color Generator -->
+      <div class="left-column">
+        <div class="section">
+          <h2>Choose Primary Color</h2>
+          <p class="desc">
+            Select your primary color to generate a complete design system
+            palette.
+          </p>
+          <div class="input-group">
+            <input
+              type="color"
+              class="input-color"
+              id="primaryColor"
+              value="#3a86ff"
+            />
+            <input
+              type="text"
+              class="rgb-input"
+              id="rgbInput"
+              placeholder="RGB or HEX (e.g., 58, 134, 255 or #3a86ff)"
+            />
+            <button class="button button-primary" onclick="generatePalette()">
+              Generate Palette
+            </button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Primary Color</h2>
+          <div class="palette-grid" id="primaryPalette"></div>
+        </div>
+
+        <div class="section">
+          <h2>System Colors</h2>
+          <p class="desc">
+            Success, warning, and error colors for notifications.
+          </p>
+          <div class="palette-grid" id="notificationsPalette"></div>
+        </div>
+
+        <div class="section">
+          <h2>Color Variations</h2>
+          <div id="variationsPalette">
+            <div class="section-title">Primary Tints</div>
+            <div class="palette-row" id="primaryTints"></div>
+
+            <div class="section-title">Primary Shades</div>
+            <div class="palette-row" id="primaryShades"></div>
+
+            <div class="section-title">Success Variations</div>
+            <div class="palette-row" id="successVariations"></div>
+
+            <div class="section-title">Warning Variations</div>
+            <div class="palette-row" id="warningVariations"></div>
+
+            <div class="section-title">Error Variations</div>
+            <div class="palette-row" id="errorVariations"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Neutral Colors</h2>
+          <p class="desc">Grayscale palette based on your primary color.</p>
+          <div class="palette-grid" id="grayscalePalette"></div>
+        </div>
+
+        <div class="section">
+          <h2>Export Palette</h2>
+          <p class="desc">
+            Export your color palette for use in design tools and development.
+          </p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap">
+            <button class="button button-primary" onclick="generateCSS()">
+              Copy CSS Variables
+            </button>
+            <button class="button button-success" onclick="exportPalette()">
+              Export JSON
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Mobile Preview -->
+      <div class="right-column">
+        <div class="mobile-preview">
+          <h2 style="margin-top: 0">Live Preview</h2>
+          <p class="desc">
+            See how your colors work in a real mobile app interface.
+          </p>
+
+          <div class="phone-container">
+            <div class="phone-screen">
+              <div class="status-bar">
+                <span>9:41</span>
+                <span>📶 📶 🔋</span>
+              </div>
+
+              <div class="app-bar">
+                <div class="app-bar-title">Dashboard</div>
+                <div style="display: flex; gap: 8px">
+                  <span>🔍</span>
+                  <span>⚙️</span>
+                </div>
+              </div>
+
+              <div class="app-content">
+                <div class="notification-banner">
+                  <span class="notification-icon">✅</span>
+                  <span class="notification-text"
+                    >Your profile is now complete!</span
+                  >
+                </div>
+
+                <div class="stats-grid">
+                  <div class="stat-card">
+                    <div class="stat-number">1,247</div>
+                    <div class="stat-label">Total Views</div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">Success Rate</div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <div class="card-icon">👤</div>
+                    <div>
+                      <div class="card-title">User Profile</div>
+                      <div class="card-subtitle">
+                        Manage your account settings
+                      </div>
+                    </div>
+                  </div>
+                  <div class="button-row">
+                    <button class="btn-primary">Edit Profile</button>
+                    <button class="btn-secondary">View Details</button>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div>
+                      <div class="card-title">Analytics</div>
+                      <div class="card-subtitle">Track your performance</div>
+                    </div>
+                  </div>
+                  <div class="button-row">
+                    <button class="btn-success">View Report</button>
+                    <button class="btn-warning">Export Data</button>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <div class="card-icon">⚠️</div>
+                    <div>
+                      <div class="card-title">System Alert</div>
+                      <div class="card-subtitle">Action required</div>
+                    </div>
+                  </div>
+                  <div class="button-row">
+                    <button class="btn-error">Fix Issue</button>
+                    <button class="btn-secondary">Dismiss</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-icon">🏠</div>
+                  <div>Home</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">📈</div>
+                  <div>Stats</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">💬</div>
+                  <div>Messages</div>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-icon">👤</div>
+                  <div>Profile</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variable to store current palette data
+      let currentPalette = {};
+
+      function hexToRgb(hex) {
+        const bigint = parseInt(hex.slice(1), 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return { r, g, b };
+      }
+
+      function hslToHex(h, s, l) {
+        l /= 100;
+        const a = (s * Math.min(l, 1 - l)) / 100;
+        const f = (n) => {
+          const k = (n + h / 30) % 12;
+          const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+          return Math.round(255 * color)
+            .toString(16)
+            .padStart(2, '0');
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+      }
+
+      function hexToHSL(H) {
+        let r = 0,
+          g = 0,
+          b = 0;
+        if (H.length === 4) {
+          r = '0x' + H[1] + H[1];
+          g = '0x' + H[2] + H[2];
+          b = '0x' + H[3] + H[3];
+        } else if (H.length === 7) {
+          r = '0x' + H[1] + H[2];
+          g = '0x' + H[3] + H[4];
+          b = '0x' + H[5] + H[6];
+        }
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        const cmin = Math.min(r, g, b),
+          cmax = Math.max(r, g, b),
+          delta = cmax - cmin;
+        let h = 0,
+          s = 0,
+          l = 0;
+        if (delta === 0) h = 0;
+        else if (cmax === r) h = ((g - b) / delta) % 6;
+        else if (cmax === g) h = (b - r) / delta + 2;
+        else h = (r - g) / delta + 4;
+        h = Math.round(h * 60);
+        if (h < 0) h += 360;
+        l = (cmax + cmin) / 2;
+        s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+        s = +(s * 100).toFixed(1);
+        l = +(l * 100).toFixed(1);
+        return { h, s, l };
+      }
+
+      function parseColorInput(input) {
+        input = input.trim();
+        if (input.match(/^#?[0-9A-Fa-f]{6}$/)) {
+          return input.startsWith('#') ? input : '#' + input;
+        }
+        const rgbMatch = input.match(/(\d+),?\s*(\d+),?\s*(\d+)/);
+        if (rgbMatch) {
+          const r = parseInt(rgbMatch[1]);
+          const g = parseInt(rgbMatch[2]);
+          const b = parseInt(rgbMatch[3]);
+          if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255) {
+            return (
+              '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
+            );
+          }
+        }
+        return null;
+      }
+
+      function getContrastColor(hex) {
+        const { r, g, b } = hexToRgb(hex);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance > 0.5 ? '#000000' : '#ffffff';
+      }
+
+      function createColorBox(color, showRgb = true) {
+        const { r, g, b } = hexToRgb(color);
+        const rgb = `rgb(${r}, ${g}, ${b})`;
+        const div = document.createElement('div');
+        div.className = 'color-box';
+        div.style.backgroundColor = color;
+        div.style.color = getContrastColor(color);
+
+        div.innerHTML = `
+          <div>${color.toUpperCase()}</div>
+          ${showRgb ? `<div class="color-code">${rgb}</div>` : ''}
+        `;
+
+        div.onclick = () => {
+          navigator.clipboard.writeText(color);
+          const originalContent = div.innerHTML;
+          div.innerHTML = '<div>Copied!</div>';
+          setTimeout(() => {
+            div.innerHTML = originalContent;
+          }, 1000);
+        };
+        return div;
+      }
+
+      function generateTints(hex, count = 4) {
+        const { h, s, l } = hexToHSL(hex);
+        const colors = [];
+        for (let i = 1; i <= count; i++) {
+          const newL = Math.min(100, l + (i * (100 - l)) / (count + 1));
+          colors.push(hslToHex(h, s, newL));
+        }
+        return colors;
+      }
+
+      function generateShades(hex, count = 4) {
+        const { h, s, l } = hexToHSL(hex);
+        const colors = [];
+        for (let i = 1; i <= count; i++) {
+          const newL = Math.max(0, l - (i * l) / (count + 1));
+          colors.push(hslToHex(h, s, newL));
+        }
+        return colors;
+      }
+
+      function generateGrayscale(primaryHex) {
+        const { h } = hexToHSL(primaryHex);
+        const colors = [];
+        for (let i = 0; i < 10; i++) {
+          const lightness = 10 + i * 10;
+          colors.push(hslToHex(h, 15, lightness));
+        }
+        return colors;
+      }
+
+      function updateButtonColors(palette) {
+        const root = document.documentElement;
+
+        // Update CSS custom properties for buttons
+        root.style.setProperty('--current-primary', palette.primary);
+        root.style.setProperty(
+          '--current-primary-shade',
+          palette.primaryShades[0]
+        );
+        root.style.setProperty('--current-success', palette.success);
+        root.style.setProperty(
+          '--current-success-shade',
+          palette.successShades[0]
+        );
+      }
+
+      function updateMobilePreview(palette) {
+        const root = document.documentElement;
+
+        // Set CSS custom properties for the mobile preview
+        root.style.setProperty('--primary-color', palette.primary);
+        root.style.setProperty('--primary-tint', palette.primaryTints[2]);
+        root.style.setProperty('--primary-shade', palette.primaryShades[1]);
+        root.style.setProperty('--success-color', palette.success);
+        root.style.setProperty('--success-tint', palette.successTints[1]);
+        root.style.setProperty('--success-shade', palette.successShades[1]);
+        root.style.setProperty('--warning-color', palette.warning);
+        root.style.setProperty('--warning-tint', palette.warningTints[1]);
+        root.style.setProperty('--error-color', palette.error);
+        root.style.setProperty('--error-tint', palette.errorTints[1]);
+        root.style.setProperty('--background-color', palette.grayscale[8]);
+        root.style.setProperty('--card-border', palette.grayscale[6]);
+        root.style.setProperty('--border-color', palette.grayscale[6]);
+        root.style.setProperty('--text-primary', palette.grayscale[1]);
+        root.style.setProperty('--text-secondary', palette.grayscale[3]);
+        root.style.setProperty('--secondary-bg', palette.grayscale[7]);
+      }
+
+      function generatePalette() {
+        const primary = document.getElementById('primaryColor').value;
+        const notificationColors = {
+          success: '#10b981',
+          warning: '#f59e0b',
+          error: '#ef4444',
+        };
+
+        // Clear existing content
+        document.getElementById('primaryPalette').innerHTML = '';
+        document.getElementById('notificationsPalette').innerHTML = '';
+        document.getElementById('primaryTints').innerHTML = '';
+        document.getElementById('primaryShades').innerHTML = '';
+        document.getElementById('successVariations').innerHTML = '';
+        document.getElementById('warningVariations').innerHTML = '';
+        document.getElementById('errorVariations').innerHTML = '';
+        document.getElementById('grayscalePalette').innerHTML = '';
+
+        // Primary color
+        document
+          .getElementById('primaryPalette')
+          .appendChild(createColorBox(primary));
+
+        // Notification colors
+        const notifContainer = document.getElementById('notificationsPalette');
+        Object.values(notificationColors).forEach((color) => {
+          notifContainer.appendChild(createColorBox(color));
+        });
+
+        // Generate variations
+        const primaryTints = generateTints(primary);
+        const primaryShades = generateShades(primary);
+        const successTints = generateTints(notificationColors.success, 2);
+        const successShades = generateShades(notificationColors.success, 2);
+        const warningTints = generateTints(notificationColors.warning, 2);
+        const warningShades = generateShades(notificationColors.warning, 2);
+        const errorTints = generateTints(notificationColors.error, 2);
+        const errorShades = generateShades(notificationColors.error, 2);
+
+        // Display variations
+        primaryTints.forEach((color) => {
+          document
+            .getElementById('primaryTints')
+            .appendChild(createColorBox(color));
+        });
+        primaryShades.forEach((color) => {
+          document
+            .getElementById('primaryShades')
+            .appendChild(createColorBox(color));
+        });
+
+        [...successTints, ...successShades].forEach((color) => {
+          document
+            .getElementById('successVariations')
+            .appendChild(createColorBox(color));
+        });
+        [...warningTints, ...warningShades].forEach((color) => {
+          document
+            .getElementById('warningVariations')
+            .appendChild(createColorBox(color));
+        });
+        [...errorTints, ...errorShades].forEach((color) => {
+          document
+            .getElementById('errorVariations')
+            .appendChild(createColorBox(color));
+        });
+
+        // Generate grayscale
+        const grayscaleColors = generateGrayscale(primary);
+        const grayscaleContainer = document.getElementById('grayscalePalette');
+        grayscaleColors.forEach((color) => {
+          grayscaleContainer.appendChild(createColorBox(color));
+        });
+
+        // Prepare data for mobile preview
+        currentPalette = {
+          primary: primary,
+          success: notificationColors.success,
+          warning: notificationColors.warning,
+          error: notificationColors.error,
+          primaryTints: primaryTints,
+          successTints: successTints,
+          warningTints: warningTints,
+          errorTints: errorTints,
+          primaryShades: primaryShades,
+          successShades: successShades,
+          warningShades: warningShades,
+          errorShades: errorShades,
+          grayscale: grayscaleColors,
+        };
+
+        // Update button colors and mobile preview
+        updateButtonColors(currentPalette);
+        updateMobilePreview(currentPalette);
+      }
+
+      function updateRGBFromPicker() {
+        const colorPicker = document.getElementById('primaryColor');
+        const rgbInput = document.getElementById('rgbInput');
+        const { r, g, b } = hexToRgb(colorPicker.value);
+        rgbInput.value = `${r}, ${g}, ${b}`;
+        rgbInput.style.borderColor = '#e5e7eb';
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', function () {
+        const colorPicker = document.getElementById('primaryColor');
+        const rgbInput = document.getElementById('rgbInput');
+
+        // Update RGB input when color picker changes
+        colorPicker.addEventListener('change', function () {
+          updateRGBFromPicker();
+          generatePalette();
+        });
+
+        // Update color picker when RGB input changes
+        rgbInput.addEventListener('input', function () {
+          const parsed = parseColorInput(this.value);
+          if (parsed) {
+            colorPicker.value = parsed;
+            this.style.borderColor = '#10b981';
+            generatePalette();
+          } else if (this.value) {
+            this.style.borderColor = '#ef4444';
+          } else {
+            this.style.borderColor = '#e5e7eb';
+          }
+        });
+
+        // Generate palette when Enter is pressed in RGB input
+        rgbInput.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            generatePalette();
+          }
+        });
+
+        // Initialize with default color
+        updateRGBFromPicker();
+        generatePalette();
+
+        // Add interactivity to mobile preview elements
+        addMobileInteractivity();
+      });
+
+      function addMobileInteractivity() {
+        // Add click handlers for navigation items
+        document.querySelectorAll('.nav-item').forEach((item, index) => {
+          item.addEventListener('click', function () {
+            document
+              .querySelectorAll('.nav-item')
+              .forEach((nav) => nav.classList.remove('active'));
+            this.classList.add('active');
+
+            // Change app bar title based on selected nav
+            const titles = ['Dashboard', 'Analytics', 'Messages', 'Profile'];
+            document.querySelector('.app-bar-title').textContent =
+              titles[index];
+          });
+        });
+
+        // Add hover effects to buttons
+        document
+          .querySelectorAll(
+            '.btn-primary, .btn-secondary, .btn-success, .btn-warning, .btn-error'
+          )
+          .forEach((btn) => {
+            btn.addEventListener('mouseenter', function () {
+              this.style.transform = 'scale(1.02)';
+              this.style.transition = 'transform 0.2s ease';
+            });
+
+            btn.addEventListener('mouseleave', function () {
+              this.style.transform = 'scale(1)';
+            });
+          });
+
+        // Add click feedback to cards
+        document.querySelectorAll('.card').forEach((card) => {
+          card.addEventListener('click', function () {
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+              this.style.transform = 'scale(1)';
+            }, 150);
+          });
+        });
+
+        // Dismiss notification banner
+        document
+          .querySelector('.notification-banner')
+          .addEventListener('click', function () {
+            this.style.opacity = '0.5';
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              this.style.display = 'none';
+            }, 300);
+          });
+
+        // Animate stat numbers
+        animateStatNumbers();
+      }
+
+      function animateStatNumbers() {
+        document.querySelectorAll('.stat-number').forEach((stat) => {
+          const finalValue = stat.textContent;
+          const isPercentage = finalValue.includes('%');
+          const numericValue = parseInt(finalValue.replace(/[^\d]/g, ''));
+
+          let currentValue = 0;
+          const increment = Math.ceil(numericValue / 30);
+
+          const timer = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= numericValue) {
+              currentValue = numericValue;
+              clearInterval(timer);
+            }
+            stat.textContent = isPercentage
+              ? currentValue + '%'
+              : currentValue.toLocaleString();
+          }, 50);
+        });
+      }
+
+      // Color palette export functionality
+      function exportPalette() {
+        if (!currentPalette.primary) {
+          alert('Please generate a palette first!');
+          return;
+        }
+
+        const paletteData = {
+          timestamp: new Date().toISOString(),
+          colors: {
+            primary: {
+              main: currentPalette.primary,
+              tints: currentPalette.primaryTints,
+              shades: currentPalette.primaryShades,
+            },
+            success: {
+              main: currentPalette.success,
+              tints: currentPalette.successTints,
+              shades: currentPalette.successShades,
+            },
+            warning: {
+              main: currentPalette.warning,
+              tints: currentPalette.warningTints,
+              shades: currentPalette.warningShades,
+            },
+            error: {
+              main: currentPalette.error,
+              tints: currentPalette.errorTints,
+              shades: currentPalette.errorShades,
+            },
+            neutral: currentPalette.grayscale,
+          },
+        };
+
+        const dataStr = JSON.stringify(paletteData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'color-palette.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      // Generate CSS variables
+      function generateCSS() {
+        if (!currentPalette.primary) {
+          alert('Please generate a palette first!');
+          return;
+        }
+
+        const cssVars = `
+/* Color Palette CSS Variables */
+:root {
+  /* Primary Colors */
+  --color-primary: ${currentPalette.primary};
+  --color-primary-tint-1: ${currentPalette.primaryTints[0]};
+  --color-primary-tint-2: ${currentPalette.primaryTints[1]};
+  --color-primary-tint-3: ${currentPalette.primaryTints[2]};
+  --color-primary-tint-4: ${currentPalette.primaryTints[3]};
+  --color-primary-shade-1: ${currentPalette.primaryShades[0]};
+  --color-primary-shade-2: ${currentPalette.primaryShades[1]};
+  --color-primary-shade-3: ${currentPalette.primaryShades[2]};
+  --color-primary-shade-4: ${currentPalette.primaryShades[3]};
+
+  /* System Colors */
+  --color-success: ${currentPalette.success};
+  --color-success-tint-1: ${currentPalette.successTints[0]};
+  --color-success-tint-2: ${currentPalette.successTints[1]};
+  --color-success-shade-1: ${currentPalette.successShades[0]};
+  --color-success-shade-2: ${currentPalette.successShades[1]};
+
+  --color-warning: ${currentPalette.warning};
+  --color-warning-tint-1: ${currentPalette.warningTints[0]};
+  --color-warning-tint-2: ${currentPalette.warningTints[1]};
+  --color-warning-shade-1: ${currentPalette.warningShades[0]};
+  --color-warning-shade-2: ${currentPalette.warningShades[1]};
+
+  --color-error: ${currentPalette.error};
+  --color-error-tint-1: ${currentPalette.errorTints[0]};
+  --color-error-tint-2: ${currentPalette.errorTints[1]};
+  --color-error-shade-1: ${currentPalette.errorShades[0]};
+  --color-error-shade-2: ${currentPalette.errorShades[1]};
+
+  /* Neutral Colors */
+  --color-neutral-50: ${currentPalette.grayscale[9]};
+  --color-neutral-100: ${currentPalette.grayscale[8]};
+  --color-neutral-200: ${currentPalette.grayscale[7]};
+  --color-neutral-300: ${currentPalette.grayscale[6]};
+  --color-neutral-400: ${currentPalette.grayscale[5]};
+  --color-neutral-500: ${currentPalette.grayscale[4]};
+  --color-neutral-600: ${currentPalette.grayscale[3]};
+  --color-neutral-700: ${currentPalette.grayscale[2]};
+  --color-neutral-800: ${currentPalette.grayscale[1]};
+  --color-neutral-900: ${currentPalette.grayscale[0]};
+}`;
+
+        navigator.clipboard
+          .writeText(cssVars)
+          .then(() => {
+            alert('CSS variables copied to clipboard!');
+          })
+          .catch(() => {
+            // Fallback: show in a modal or text area
+            const textarea = document.createElement('textarea');
+            textarea.value = cssVars;
+            textarea.style.position = 'fixed';
+            textarea.style.top = '50%';
+            textarea.style.left = '50%';
+            textarea.style.transform = 'translate(-50%, -50%)';
+            textarea.style.width = '80%';
+            textarea.style.height = '60%';
+            textarea.style.zIndex = '9999';
+            textarea.style.background = 'white';
+            textarea.style.border = '2px solid #ccc';
+            textarea.style.padding = '20px';
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = 'Close';
+            closeBtn.style.position = 'fixed';
+            closeBtn.style.top = 'calc(50% + 35%)';
+            closeBtn.style.left = '50%';
+            closeBtn.style.transform = 'translateX(-50%)';
+            closeBtn.style.zIndex = '10000';
+            closeBtn.onclick = () => {
+              document.body.removeChild(textarea);
+              document.body.removeChild(closeBtn);
+            };
+            document.body.appendChild(closeBtn);
+          });
+      }
+    </script>
+  </body>
+</html>
